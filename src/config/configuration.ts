@@ -4,4 +4,9 @@ export default () => ({
   database: {
     uri: process.env.MONGODB_URI,
   },
+  auth: {
+    jwtSecret:
+      process.env.JWT_SECRET ??
+      'development-only-change-this-secret-before-deploying',
+  },
 });

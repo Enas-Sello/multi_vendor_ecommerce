@@ -1,4 +1,3 @@
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 import configuration from './config/configuration.js';
@@ -7,7 +6,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './utils/transform.interceptor.js';
 
 async function bootstrap() {
-
   const { port, nodeEnv } = configuration();
 
   const app = await NestFactory.create(AppModule, {
@@ -33,7 +31,8 @@ async function bootstrap() {
     .setTitle('multi vendor ecommerce')
     .setDescription('The multi vendor ecommerce API description')
     .setVersion('1.0')
-    .addCookieAuth() // Optional: Enables lock icons for protected route
+    .addCookieAuth('auth_token', { type: 'apiKey', in: 'cookie', name: 'auth_token' }, 'access-cookie')
+    .addCookieAuth('refresh_token', { type: 'apiKey', in: 'cookie', name: 'refresh_token' }, 'refresh-cookie')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
