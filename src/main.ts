@@ -1,15 +1,12 @@
-// import dns from 'node:dns';
-
-// dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 import configuration from './config/configuration.js';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { TransformInterceptor } from './utils/transform.interceptor.js';
 
 async function bootstrap() {
-  // const port = configuration().port;
 
   const { port, nodeEnv } = configuration();
 
@@ -29,13 +26,14 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalInterceptors(new TransformInterceptor());
+
   // swager
   const config = new DocumentBuilder()
     .setTitle('multi vendor ecommerce')
     .setDescription('The multi vendor ecommerce API description')
     .setVersion('1.0')
-    .addTag('multi vendor ecommerce') // Grouping tag
-    // .addBearerAuth() // Optional: Enables lock icons for protected route
+    .addCookieAuth() // Optional: Enables lock icons for protected route
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
@@ -44,11 +42,9 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  Logger.log(`Application running on: ${await app.getUrl()}`);
-
   if (nodeEnv !== 'production') {
     Logger.log(`Swagger documentation: ${await app.getUrl()}/api`);
-  }
+  } else Logger.log(`Application running on: ${await app.getUrl()}`);
 }
 
 await bootstrap();
